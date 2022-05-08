@@ -26,14 +26,17 @@ app.post("/", function (req, res) {
 
     var job = child_process.exec(req.body.command);
     job.stdout.on("data", function (data) {
+      console.log(data);
       res.write(data);
     });
 
     job.stderr.on("data", function (data) {
+      console.error(data);
       res.write(data);
     });
 
     job.on("close", function (code) {
+      console.log("Command exited with code " + code);
       res.end();
     });
   }
