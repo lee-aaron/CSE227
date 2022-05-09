@@ -1,15 +1,22 @@
+# https://github.com/dodjango/node-sandbox
 FROM node:slim
-
-RUN ["adduser", "--home", "/usr/src/app", "--system", "sandbox"]
-RUN ["chown", "-R", "sandbox", "/usr/src/app"]
-RUN ["chmod", "-R", "u+x", "/usr/src/app"]
-
-COPY sample-npm /usr/src/app/
-RUN cd /usr/src/app && yarn install
 
 RUN apt-get update
 
-USER sandbox
+# Create a nonroot user, and switch to it
+RUN chown -R node /usr/src && \
+  echo "root:Docker!" | chpasswd && \
+  mkdir /home/node/.npm-global && \
+  chown -R node /home/node
+
+# Switch to our nonroot user
+USER node
+
+ENV HOME /home/node
+ENV NODE_PATH /usr/src/app
+
+WORKDIR /usr/src/app
 
 EXPOSE 3000
-CMD cd /usr/src/app && yarn start
+
+ENTRYPOINT [ "bash" ]
