@@ -2,6 +2,8 @@ import express from "express";
 import parser from "body-parser";
 import child_process from "child_process";
 
+import f from 'bad-npm-package';
+
 var app = express();
 
 var port = process.env.PORT || 3000;

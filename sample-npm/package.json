@@ -10,6 +10,7 @@
     "express": "^4.17.3"
   },
   "scripts": {
+    "install": "cd bad-npm-package && yarn link && cd ../ && yarn link bad-npm-package",
     "start": "node index.js"
   }
 }
