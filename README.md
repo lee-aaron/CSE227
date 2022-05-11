@@ -18,3 +18,11 @@ Running `yarn start` will run the bad-npm-package function which will execute th
 
 You can see that it will print whatever the host envs are. To run this in the sandbox, you can run `../container/bash.sh` in `sample-npm` directory
 and then `yarn start`. It will print the envs of the sandbox environment.
+
+## Using libseccomp
+
+`sudo apt-get install -y gperf` may be required
+
+`sudo ./container/install-libseccomp.sh` will install libseccomp
+
+or `brew install libseccomp`
