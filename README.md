@@ -12,7 +12,7 @@ Build the Dockerfile first before running `../container/yarn.sh` in `sample-npm`
 
 ## Sample Bad NPM Package Example
 
-We can try first by running `yarn` to link the bad package to our dev repo.
+We can try first by running `cd sample-npm && yarn` to link the bad package to our dev repo.
 
 Running `yarn start` will run the bad-npm-package function which will execute the malicious function.
 
