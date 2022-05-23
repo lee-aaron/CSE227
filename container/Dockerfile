@@ -9,7 +9,7 @@ RUN chown -R node /usr/src && \
   mkdir /home/node/.npm-global && \
   chown -R node /home/node
 
-RUN apt-get install -y libseccomp2 libseccomp-dev seccomp python3-seccomp
+RUN apt-get install -y libseccomp2 libseccomp-dev seccomp python3-seccomp curl
 
 # Switch to our nonroot user
 USER node
