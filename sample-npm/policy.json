@@ -1,0 +1,27 @@
+{
+  "onerror": "throw",
+  "resources": {
+    "./index.js": {
+      "integrity": "sha512-+TczYjVYFEzN0ZnKar0507ynr9+kiwgWc6EaI8bjnM3oldfFqqmgbDbQBoXm3dV1x9d5PsUlOsectHKqC47mlg==",
+      "dependencies": true
+    },
+    "./package.json": {
+      "integrity": "sha512-u4c3SxYUFJSXOs1VCZOaknr8T3x7YeSKL28AStkzLsCx5SuLKJAjenLzEhSluQ+seX+Uzm4apiXBNHBsgXNbTg==",
+      "dependencies": true
+    }
+  },
+  "scopes": {
+    "./node_modules": {
+      "integrity": true,
+      "dependencies": true
+    },
+    "./index.js": {
+      "integrity": true,
+      "dependencies": true
+    },
+    "./package.json": {
+      "integrity": true,
+      "dependencies": true
+    }
+  }
+}
