@@ -26,3 +26,9 @@ and then `yarn start`. It will print the envs of the sandbox environment.
 `sudo ./container/install-libseccomp.sh` will install libseccomp
 
 or `brew install libseccomp`
+
+## Policy
+
+You will need a required-files.json file structured as an array of files or folders to create policies for.
+
+`node ../policy/generate.js && node --experimental-policy=policy.json index.js`
