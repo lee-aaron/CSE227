@@ -1,6 +1,7 @@
 const fs = require("fs");
 const { fromStream } = require("ssri");
 const { relative, sep } = require("path");
+const traverse_directory = require("./utils");
 
 const baseDir = process.cwd();
 
@@ -43,12 +44,25 @@ requiredFiles.forEach(async (file) => {
       integrity: integrity,
       dependencies: true,
     };
+    policyJson.scopes[path] = {
+      integrity: true,
+      dependencies: true,
+    };
+  } else {
+    const files = traverse_directory(file);
+    files.forEach(async (file) => {
+      const integrity = await computeIntegrity(file);
+      const relPath = relativePath(baseDir, file);
+      policyJson.resources[relPath] = {
+        integrity: integrity,
+        dependencies: true,
+      };
+      policyJson.scopes[relPath] = {
+        integrity: true,
+        dependencies: true,
+      };
+    });
   }
-
-  policyJson.scopes[path] = {
-    integrity: true,
-    dependencies: true,
-  };
 
   fs.writeFile(
     `${baseDir}/policy.json`,
