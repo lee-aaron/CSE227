@@ -51,35 +51,26 @@ requiredFiles.forEach(async (file) => {
   } else {
     const files = traverse_directory(file);
 
-    await Promise.all(files.map(async (l_file) => {
-      const integrity = await computeIntegrity(l_file);
-      const relPath = relativePath(baseDir, l_file);
+    await Promise.all(
+      files.map(async (l_file) => {
+        const integrity = await computeIntegrity(l_file);
+        const relPath = relativePath(baseDir, l_file);
 
-      policyJson.resources[relPath] = {
-        integrity: integrity,
-        dependencies: gen_dependencies(true),
-      };
-      policyJson.scopes[relPath] = {
-        integrity: true,
-        dependencies: gen_dependencies(true),
-      };
-    }));
+        policyJson.resources[relPath] = {
+          integrity: integrity,
+          dependencies: gen_dependencies(true),
+        };
+        policyJson.scopes[relPath] = {
+          integrity: true,
+          dependencies: gen_dependencies(true),
+        };
+      })
+    );
   }
 
-  fs.writeFile(
+  fs.writeFileSync(
     `${baseDir}/policy.json`,
-    JSON.stringify(policyJson, null, 2),
-    (err) => {
-      if (err) {
-        console.log(err);
-        process.exit(1);
-      }
-    }
+    JSON.stringify(policyJson, null, 2)
   );
-  fs.chmod(`${baseDir}/policy.json`, 0o755, (err) => {
-    if (err) {
-      console.log(err);
-      process.exit(1);
-    }
-  });
+  fs.chmodSync(`${baseDir}/policy.json`, 0o755);
 });
