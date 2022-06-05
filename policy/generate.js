@@ -1,7 +1,7 @@
 const fs = require("fs");
 const { fromStream } = require("ssri");
 const { relative, sep } = require("path");
-const traverse_directory = require("./utils");
+const { traverse_directory, gen_dependencies } = require("./utils");
 
 const baseDir = process.cwd();
 
@@ -50,18 +50,20 @@ requiredFiles.forEach(async (file) => {
     };
   } else {
     const files = traverse_directory(file);
-    files.forEach(async (file) => {
-      const integrity = await computeIntegrity(file);
-      const relPath = relativePath(baseDir, file);
+
+    await Promise.all(files.map(async (l_file) => {
+      const integrity = await computeIntegrity(l_file);
+      const relPath = relativePath(baseDir, l_file);
+
       policyJson.resources[relPath] = {
         integrity: integrity,
-        dependencies: true,
+        dependencies: gen_dependencies(true),
       };
       policyJson.scopes[relPath] = {
         integrity: true,
-        dependencies: true,
+        dependencies: gen_dependencies(true),
       };
-    });
+    }));
   }
 
   fs.writeFile(

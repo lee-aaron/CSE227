@@ -18,4 +18,21 @@ function traverse_directory(dir) {
   return files_path;
 }
 
-module.exports = traverse_directory;
+// as a PoC demonstrate allow all vs deny all
+function gen_dependencies(perms) {
+  let dependencies = {};
+
+  if (perms) {
+    dependencies = true
+  } else {
+    dependencies = {
+      fs: false,
+      os: false,
+      http: { import: false }
+    };
+  }
+
+  return dependencies;
+}
+
+module.exports = { traverse_directory, gen_dependencies };
