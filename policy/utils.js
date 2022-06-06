@@ -18,21 +18,27 @@ function traverse_directory(dir) {
   return files_path;
 }
 
+function get_node_packages() {
+  let node_modules = [];
+
+  if (fs.existsSync("./node_modules")) {
+    node_modules = fs
+      .readdirSync("./node_modules", { withFileTypes: true })
+      .filter((d) => d.isDirectory());
+  }
+
+  return node_modules;
+}
+
 // as a PoC demonstrate allow all vs deny all
 function gen_dependencies(perms) {
   let dependencies = {};
 
   if (perms) {
-    dependencies = true
-  } else {
-    dependencies = {
-      fs: false,
-      os: false,
-      http: { import: false }
-    };
+    dependencies = true;
   }
 
   return dependencies;
 }
 
-module.exports = { traverse_directory, gen_dependencies };
+module.exports = { traverse_directory, gen_dependencies, get_node_packages };

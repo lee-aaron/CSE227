@@ -1,5 +1,16 @@
-[
-  "node_modules",
-  "index.js",
-  "package.json"
-]
+{
+  "express": {
+    "dependencies": true,
+    "scope": {
+      "cascade": true,
+      "integrity": true
+    }
+  },
+  "body-parser":  {
+    "dependencies": true,
+    "scope": {
+      "cascade": true,
+      "integrity": true
+    }
+  }
+}

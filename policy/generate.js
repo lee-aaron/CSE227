@@ -1,7 +1,11 @@
 const fs = require("fs");
 const { fromStream } = require("ssri");
 const { relative, sep } = require("path");
-const { traverse_directory, gen_dependencies } = require("./utils");
+const {
+  traverse_directory,
+  gen_dependencies,
+  get_node_packages,
+} = require("./utils");
 
 const baseDir = process.cwd();
 
@@ -17,7 +21,7 @@ const files = fs.readFileSync(`${baseDir}/required-files.json`, "utf8");
 const requiredFiles = JSON.parse(files);
 
 const policyJson = {
-  onerror: "throw",
+  onerror: "log",
   resources: {},
   scopes: {},
 };
@@ -34,43 +38,65 @@ const computeIntegrity = async (path) => {
   return src.toString();
 };
 
-requiredFiles.forEach(async (file) => {
-  // use scopes to create policy file
-  let path = relativePath(baseDir, file);
+const node_packages = get_node_packages();
 
-  if (fs.lstatSync(file).isFile()) {
-    const integrity = await computeIntegrity(file);
-    policyJson.resources[path] = {
-      integrity: integrity,
-      dependencies: true,
-    };
-    policyJson.scopes[path] = {
-      integrity: true,
-      dependencies: true,
-    };
-  } else {
-    const files = traverse_directory(file);
+async function main() {
+  await Promise.all(
+    node_packages.map(async (package) => {
 
-    await Promise.all(
-      files.map(async (l_file) => {
-        const integrity = await computeIntegrity(l_file);
-        const relPath = relativePath(baseDir, l_file);
+      if (Object.keys(requiredFiles).indexOf(package.name) > -1) {
+        const dep = requiredFiles[package.name].dependencies;
+        const scope = requiredFiles[package.name].scope;
+        let path = relativePath(baseDir, "node_modules/" + package.name);
 
-        policyJson.resources[relPath] = {
-          integrity: integrity,
-          dependencies: gen_dependencies(true),
-        };
-        policyJson.scopes[relPath] = {
-          integrity: true,
-          dependencies: gen_dependencies(true),
-        };
-      })
-    );
-  }
+        // iterate thru each package and set dependencies for each file
+        const files = traverse_directory(path);
 
+        await Promise.all(
+          files.map(async (file) => {
+            const rel = relativePath(baseDir, file);
+            const integrity = await computeIntegrity(rel);
+            if (typeof dep === "boolean") {
+              policyJson.resources[rel] = {
+                integrity: integrity,
+                dependencies: gen_dependencies(dep),
+              };
+            } else {
+              policyJson.resources[rel] = {
+                integrity: integrity,
+                dependencies: dep,
+              };
+            }
+          })
+        );
+
+        if (scope) {
+          policyJson.scopes[path] = scope;
+        }
+      } else {
+        // default no permissions
+        let path = relativePath(baseDir, "node_modules/" + package.name);
+        const files = traverse_directory(path);
+
+        await Promise.all(
+          files.map(async (file) => {
+            const rel = relativePath(baseDir, file);
+            const integrity = await computeIntegrity(rel);
+            policyJson.resources[rel] = {
+              integrity: integrity,
+              dependencies: gen_dependencies(false),
+            };
+          })
+        );
+      }
+    })
+  );
+  
   fs.writeFileSync(
     `${baseDir}/policy.json`,
     JSON.stringify(policyJson, null, 2)
   );
   fs.chmodSync(`${baseDir}/policy.json`, 0o755);
-});
+}
+
+main();
